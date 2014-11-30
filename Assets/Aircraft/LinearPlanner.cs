@@ -272,9 +272,9 @@ public class LinearPlanner
 	{
 		if (accelerationPeriods.Count == 0)
 		{
-//			float settleTime = 10f;
-//			_currentSpeed = 0f;
-//			_currentValue = Mathf.MoveTowards(_currentValue, _targetValue, maxSpeed * deltaTime / settleTime);
+			float settleTime = 10f;
+			_currentSpeed = 0f;
+			_currentValue = Mathf.MoveTowards(_currentValue, _targetValue, maxSpeed * deltaTime / settleTime);
 			return;
 		}
 
