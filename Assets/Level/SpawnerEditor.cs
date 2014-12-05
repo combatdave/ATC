@@ -8,16 +8,22 @@ public class SpawnerEditor : Editor
 {
 	public override void OnInspectorGUI()
 	{
-		Spawner myTarget = target as Spawner;
+		DrawDefaultInspector();
+		//Spawner myTarget = target as Spawner;
 		//myTarget.MyValue = EditorGUILayout.IntSlider("Val-you", myTarget.MyValue, 1, 10);
 	}
 
 
 	void OnSceneGUI()
 	{
-		Spawner myTarget = target as Spawner;
+		Spawner spawner = target as Spawner;
 
 		Handles.color = Color.red;
-		Handles.DrawWireDisc(myTarget.transform.position, Vector3.up, 20f);
+
+		Vector3 minHeight = Vector3.up * spawner.minAltitude / ScaleManager.verticalScale;
+		Handles.DrawWireDisc(spawner.transform.position + minHeight, Vector3.up, spawner.worldSize / ScaleManager.horizontalScale);
+
+		Vector3 maxHeight = Vector3.up * spawner.maxAltitude / ScaleManager.verticalScale;
+		Handles.DrawWireDisc(spawner.transform.position + maxHeight, Vector3.up, spawner.worldSize / ScaleManager.horizontalScale);
 	}
 }

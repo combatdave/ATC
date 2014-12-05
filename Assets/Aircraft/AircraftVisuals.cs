@@ -64,7 +64,7 @@ public class AircraftVisuals : MonoBehaviour
 			Vector3 headingVector = Quaternion.Euler(new Vector3(0f, headingAtTime, 0f)) * Vector3.forward;
 			
 			Vector3 p1 = p0 + (headingVector * speedInUnitsPerSecond * timeStepForPrediction);
-			p1.y = altitudeAtTime / ScaleManager.Instance.verticalScale;
+			p1.y = altitudeAtTime / ScaleManager.verticalScale;
 
 			predictionLine.SetPosition(i-1, p1);
 

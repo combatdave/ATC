@@ -76,7 +76,7 @@ public class LinearPlanner
 	}
 	
 
-	private void CreateNewPlan()
+	public void CreateNewPlan()
 	{
 		if (debug)
 		{
@@ -91,7 +91,7 @@ public class LinearPlanner
 		float distanceNeededToStopFromFullSpeed = Mathf.Abs( (0 - Mathf.Pow(maxSpeed, 2f)) / (2f * acceleration) );
 		float distanceNeededToFullSpeedFromZero = distanceNeededToStopFromFullSpeed;
 		float distanceNeededToStopFromCurrent = Mathf.Abs( (0 - Mathf.Pow(CurrentSpeed, 2f)) / (2f * acceleration) );
-		float distanceNeededToFullSpeedFromCurrent = Mathf.Abs( (Mathf.Pow(maxSpeed, 2f) - Mathf.Pow(CurrentSpeed, 2f)) / (2f * acceleration) );
+		//float distanceNeededToFullSpeedFromCurrent = Mathf.Abs( (Mathf.Pow(maxSpeed, 2f) - Mathf.Pow(CurrentSpeed, 2f)) / (2f * acceleration) );
 		
 		accelerationPeriods.Clear();
 		
@@ -294,5 +294,12 @@ public class LinearPlanner
 			_currentSpeed = currentAccelerationPeriod.finalSpeed;
 			accelerationPeriods.RemoveAt(0);
 		}
+	}
+
+
+	public void SetCurrentAndTarget(float currentVal, float targetVal)
+	{
+		_currentValue = currentVal;
+		_targetValue = targetVal;
 	}
 }

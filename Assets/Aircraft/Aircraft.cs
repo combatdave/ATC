@@ -9,12 +9,12 @@ public class Aircraft : MonoBehaviour
 	{
 		get
 		{
-			return transform.position.y * ScaleManager.Instance.verticalScale;
+			return transform.position.y * ScaleManager.verticalScale;
 		}
 		set
 		{
 			Vector3 pos = transform.position;
-			pos.y = value / ScaleManager.Instance.verticalScale;
+			pos.y = value / ScaleManager.verticalScale;
 			transform.position = pos;
 		}
 	}
@@ -60,6 +60,14 @@ public class Aircraft : MonoBehaviour
 		{
 			GetComponent<HeadingController>().TargetHeadingInDegrees = value;
 		}
+//		get
+//		{
+//			return GetComponent<FutureHeadingPlanner>().GetCurrentTargetHeading();
+//		}
+//		set
+//		{
+//			GetComponent<FutureHeadingPlanner>().SetCurrentTargetHeading(value);
+//		}
 	}
 	
 

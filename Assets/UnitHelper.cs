@@ -14,6 +14,6 @@ public class UnitHelper : MonoBehaviour
 	public static float KMPerHourToUnitsPerSecond(float kmPerHour)
 	{
 		float metersPerSecond = UnitHelper.KMPerHourToMetersPerSecond(kmPerHour);
-		return metersPerSecond / ScaleManager.Instance.horizontalScale;
+		return metersPerSecond / ScaleManager.horizontalScale;
 	}
 }

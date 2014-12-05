@@ -35,6 +35,12 @@ public class InputManager : Singleton<InputManager>
 	}
 
 
+	public void DeselectAircraft()
+	{
+		SetSelectedAircraft(null);
+	}
+
+
 	public void IncreaseTargetAltitude()
 	{
 		if (Selected == null)
@@ -64,7 +70,7 @@ public class InputManager : Singleton<InputManager>
 			return;
 		}
 		
-		Selected.TargetHeadingInDegrees += 45f;
+		Selected.TargetHeadingInDegrees += 90f;
 	}
 	
 	
@@ -75,7 +81,7 @@ public class InputManager : Singleton<InputManager>
 			return;
 		}
 		
-		Selected.TargetHeadingInDegrees -= 45f;
+		Selected.TargetHeadingInDegrees -= 90;
 	}
 
 
