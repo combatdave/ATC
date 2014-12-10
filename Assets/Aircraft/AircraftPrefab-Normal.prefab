@@ -202,6 +202,7 @@ GameObject:
   - 114: {fileID: 11400018}
   - 114: {fileID: 11400016}
   - 114: {fileID: 11400020}
+  - 114: {fileID: 11400026}
   m_Layer: 8
   m_Name: ZoomedOutUI
   m_TagString: Untagged
@@ -583,8 +584,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   verticalAcceleration: 3
   maxVerticalSpeed: 50
-  maxTurnSpeed: 10
-  turnAcceleration: 3
+  maxTurnSpeed: 3
+  turnAcceleration: 1
   speedInKMPerHour: 330
 --- !u!114 &11400010
 MonoBehaviour:
@@ -620,7 +621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 1, b: .875862122, a: 1}
+  m_Color: {r: 0, g: .83448267, b: 1, a: 1}
   m_Sprite: {fileID: 21300000, guid: 53b21bb1f6fb2354f8c0270c4cb394d0, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
@@ -697,7 +698,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: .801470578, g: .801470578, b: .801470578, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: .784313738, g: .784313738, b: .784313738, a: 1}
     m_DisabledColor: {r: .784313738, g: .784313738, b: .784313738, a: .501960814}
@@ -742,7 +743,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47265cebeb47b8940918777592ef9905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navigationUIPrefab: {fileID: 11400006, guid: 11d94b8235d66d34bbcbcc2daa82c079, type: 2}
+  UICanvasTag: UICanvas
+  navigationUIPrefab: {fileID: 11400002, guid: a09f6986e0d61344db5e7b26f73825a8, type: 2}
+--- !u!114 &11400026
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a1530bb3f57bc141b5e3de917279c2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialPixelHeight: 320
 --- !u!120 &12000000
 LineRenderer:
   m_ObjectHideFlags: 1
@@ -846,7 +860,7 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100020}
-  m_LocalRotation: {x: 3.09086232e-08, y: .707106829, z: .707106829, w: -3.09086232e-08}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -863,7 +877,7 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100022}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -3.09086232e-08, y: -.707106829, z: -.707106829, w: 3.09086232e-08}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

@@ -29,7 +29,14 @@ public class InputManager : Singleton<InputManager>
 
 	public void SetSelectedAircraft(Aircraft aircraft)
 	{
+		if (Selected != null)
+		{
+			Selected.GetComponent<NavigationUIHandler>().HideUI();
+		}
+
 		Selected = aircraft;
+
+		Selected.GetComponent<NavigationUIHandler>().ShowUI();
 
 		aircraftSettingsPanel.SetActive(Selected != null);
 	}
@@ -90,11 +97,11 @@ public class InputManager : Singleton<InputManager>
 		if (height < 1000f)
 		{
 			float rounding = 10f;
-			return string.Format("{0}m", Mathf.Round(height / rounding) * rounding);
+			return string.Format("{0}M", Mathf.Round(height / rounding) * rounding);
 		}
 		
 		height = height / 1000f;
-		return string.Format("{0:F1} km", height);
+		return string.Format("{0:F1}KM", height);
 	}
 
 

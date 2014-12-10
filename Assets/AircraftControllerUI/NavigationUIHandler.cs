@@ -5,11 +5,12 @@ using System.Collections;
 [RequireComponent(typeof(Collider)), RequireComponent(typeof(Aircraft))]
 public class NavigationUIHandler : MonoBehaviour
 {
+	public string UICanvasTag = "UICanvas";
 	public AircraftControllerUI navigationUIPrefab;
 	private AircraftControllerUI navigationUI;
+	
 
-
-	void OnMouseUpAsButton()
+	public void ShowUI()
 	{
 		if (navigationUI == null)
 		{
@@ -20,17 +21,36 @@ public class NavigationUIHandler : MonoBehaviour
 	}
 
 
-	private AircraftControllerUI SpawnUI()
+	public void HideUI()
 	{
-		AircraftControllerUI existingUI = GetComponentInChildren<AircraftControllerUI>();
-		if (existingUI != null)
+		if (navigationUI == null)
 		{
-			return existingUI;
+			return;
 		}
 
-		AircraftControllerUI ui = Instantiate(navigationUIPrefab, transform.position, transform.rotation) as AircraftControllerUI;
-		ui.transform.SetParent(transform);
-		ui.MyAircraft = GetComponent<Aircraft>();
-		return ui;
+		navigationUI.SetShouldBeVisible(false);
+	}
+
+
+	private AircraftControllerUI SpawnUI()
+	{
+		GameObject parent = GameObject.FindGameObjectWithTag(UICanvasTag);
+
+		if (parent != null)
+		{
+			AircraftControllerUI ui = Instantiate(navigationUIPrefab) as AircraftControllerUI;
+			ui.transform.SetParent(parent.transform);
+			ui.transform.localPosition = Vector3.zero;
+			ui.transform.localScale = Vector3.one;
+			ui.transform.localRotation = Quaternion.identity;
+			ui.MyAircraft = GetComponent<AircraftBase>();
+			return ui;
+		}
+		else
+		{
+			Debug.LogError("Couldn't find UI canvas with tag " + UICanvasTag + " when trying to spawn navigation UI");
+		}
+
+		return null;
 	}
 }

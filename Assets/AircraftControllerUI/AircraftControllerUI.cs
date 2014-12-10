@@ -7,16 +7,19 @@ using UnityTools;
 
 public class AircraftControllerUI : MonoBehaviour
 {
-	public AircraftBase MyAircraft{get; set;}
+	private AircraftBase _myAircraft;
+	public AircraftBase MyAircraft
+	{
+		get { return _myAircraft; }
+		set
+		{
+			_myAircraft = value;
 
-	public RectTransform inputHandle;
-	public RectTransform currentTargetHandle;
-	public RectTransform currentHeadingHandle;
-	
-	public Text targetAltitudeText;
-	public Text currentAltitudeText;
+			altitudeUI.SetTargetAltitude(MyAircraft.TargetAltitudeInMeters);
+			headingUI.SetTargetHeading(MyAircraft.TargetHeadingInDegrees);
+		}
+	}
 
-	public Image angleDifferenceDisplay;
 
 	public ChevronAnimator ascentDescentChevrons;
 
@@ -25,13 +28,12 @@ public class AircraftControllerUI : MonoBehaviour
 
 	public CanvasGroup horizontalNavigationCanvasGroup;
 	public CanvasGroup altitudeDisplayCanvasGroup;
-
-
-	private float targetHeadingAngle = 0f;
+	
 
 	public float becomeVisibleTime = 1f;
 	private float currentVisibility = 0f;
 
+	public HeadingUI headingUI;
 	public AltitudeUI altitudeUI;
 
 
@@ -45,39 +47,38 @@ public class AircraftControllerUI : MonoBehaviour
 
 	void Awake()
 	{
-		MyAircraft = GetComponentInParent<AircraftBase>();
 		SetCurrentVisibility(currentVisibility);
 	}
 	
 
-	void Start()
-	{
-		targetHeadingAngle = MyAircraft.TargetHeadingInDegrees;
-		UpdateHeadingInputHandle();
-		UpdateHeadingTargetHandle();
-
-		altitudeUI.SetTargetAltitude(MyAircraft.TargetAltitudeInMeters);
-	}
-
-
 	void Update()
 	{
-		transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.forward);
+		if (MyAircraft == null)
+		{
+			Debug.Log("Aircraft for UI is null in update, destroying");
+			Destroy(gameObject);
+			return;
+		}
+
+		UpdateUIState();
 
 		// Update the acent/descent chevrons
 		ascentDescentChevrons.SetAscentAmount(MyAircraft.GetCurrentAltitudeChangeNormalized());
 
-		currentHeadingHandle.localRotation = Quaternion.Euler(0f, 0f, -MyAircraft.CurrentHeadingInDegrees - 90f);
-
-		UpdateUIState();
-
+		headingUI.SetCurrentHeadingAndTarget(MyAircraft.CurrentHeadingInDegrees, MyAircraft.TargetHeadingInDegrees);
 		altitudeUI.SetCurrentAltitude(MyAircraft.CurrentAltitudeInMeters);
+	}
 
-		float fillAmount = (MyAircraft.TargetHeadingInDegrees - MyAircraft.CurrentHeadingInDegrees) / 360f;
 
+	void LateUpdate()
+	{
+		Vector3 screenPos = Camera.main.WorldToScreenPoint(MyAircraft.transform.position);
+		RectTransform myRectTransform = GetComponent<RectTransform>();
 
-		angleDifferenceDisplay.fillAmount = Mathf.Abs(fillAmount);
-		angleDifferenceDisplay.fillClockwise = fillAmount < 0f;
+		screenPos -= new Vector3(Camera.main.pixelWidth, Camera.main.pixelHeight, 0f) / 2f;
+		screenPos.z = 0f;
+
+		myRectTransform.anchoredPosition = screenPos;
 	}
 
 
@@ -91,7 +92,14 @@ public class AircraftControllerUI : MonoBehaviour
 
 		if (currentVisibility != targetVisibility)
 		{
-			currentVisibility = Mathf.MoveTowards(currentVisibility, targetVisibility, Time.deltaTime / becomeVisibleTime);
+			if (becomeVisibleTime > 0f)
+			{
+				currentVisibility = Mathf.MoveTowards(currentVisibility, targetVisibility, Time.deltaTime / becomeVisibleTime);
+			}
+			else
+			{
+				currentVisibility = targetVisibility;
+			}
 			SetCurrentVisibility(currentVisibility);
 		}
 
@@ -126,70 +134,8 @@ public class AircraftControllerUI : MonoBehaviour
 	{
 		CanvasGroup cg = GetComponent<CanvasGroup>();
 		cg.alpha = visibility;
+
+		cg.interactable = visibility > 0f;
+		cg.blocksRaycasts = visibility > 0f;
 	}
-
-
-#region UI Updaters
-
-	private void UpdateHeadingInputHandle()
-	{
-		inputHandle.localRotation = Quaternion.Euler(0f, 0f, -targetHeadingAngle - 90f);
-	}
-	
-	
-	private void UpdateHeadingTargetHandle()
-	{
-		currentTargetHandle.localRotation = Quaternion.Euler(0f, 0f, -targetHeadingAngle - 90f);
-	}
-
-
-	void SetAircraftTargetHeading()
-	{
-		float angleDifference = targetHeadingAngle - MyAircraft.CurrentHeadingInDegrees;
-
-		if (angleDifference < -180)
-		{
-			angleDifference += 360f;
-		}
-		else if (angleDifference > 180f)
-		{
-			angleDifference -= 360f;
-		}
-
-		MyAircraft.TargetHeadingInDegrees = MyAircraft.CurrentHeadingInDegrees + angleDifference;
-	}
-
-#endregion
-
-
-#region UI Events
-
-	public void OnDragHeadingHandle(BaseEventData e)
-	{
-		PointerEventData pointerEvent = e as PointerEventData;
-
-		Vector3 uiCenterPoint = inputHandle.position;
-		Ray mouseRay = Camera.main.ScreenPointToRay(pointerEvent.position);
-		Plane plane = new Plane(Vector3.up, uiCenterPoint);
-		float dist = 0f;
-		if (plane.Raycast(mouseRay, out dist))
-		{
-			Vector3 worldMousePos = mouseRay.origin + (mouseRay.direction * dist);
-
-			Vector2 mouseOffset = new Vector2(worldMousePos.x - uiCenterPoint.x, worldMousePos.z - uiCenterPoint.z);
-			targetHeadingAngle = -Mathf.Atan2(-mouseOffset.x, mouseOffset.y) * Mathf.Rad2Deg;
-
-			UpdateHeadingInputHandle();
-		}
-	}
-
-
-	public void OnEndDragHeadingHandle(BaseEventData e)
-	{
-		UpdateHeadingTargetHandle();
-		SetAircraftTargetHeading();
-	}
-
-
-#endregion
 }

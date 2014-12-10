@@ -13,7 +13,7 @@ public class KeepFixedSize : MonoBehaviour
 	}
 
 	
-	void Update() 
+	void LateUpdate() 
 	{
 		Plane plane = new Plane(Camera.main.transform.forward, Camera.main.transform.position); 
 		float distance = plane.GetDistanceToPoint(transform.position);

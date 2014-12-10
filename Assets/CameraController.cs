@@ -71,10 +71,10 @@ public class CameraController : MonoBehaviour
 	void LateUpdate()
 	{
 		Aircraft currentSelected = InputManager.Instance.Selected;
-		if (currentSelected != null && currentSelected != lastLookingAt)
-		{
-			doAutoZoom = true;
-		}
+//		if (currentSelected != null && currentSelected != lastLookingAt)
+//		{
+//			doAutoZoom = true;
+//		}
 		lastLookingAt = currentSelected;
 
 		float targetZoomedInAmount = ZoomedInAmount;
