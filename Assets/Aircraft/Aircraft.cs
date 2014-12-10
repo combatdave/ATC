@@ -2,10 +2,11 @@
 using System.Collections;
 
 
-public class Aircraft : MonoBehaviour
+public class Aircraft : AircraftBase
 {
 	public float speedInKMPerHour = 330f;
-	public float CurrentAltitudeInMeters
+
+	public override float CurrentAltitudeInMeters
 	{
 		get
 		{
@@ -18,26 +19,9 @@ public class Aircraft : MonoBehaviour
 			transform.position = pos;
 		}
 	}
-	public float CurrentHeadingInDegrees
-	{
-		get
-		{
-			return transform.rotation.eulerAngles.y;
-		}
-		set
-		{
-			transform.rotation = Quaternion.Euler(new Vector3(0f, value, 0f));
-		}
-	}
 
-	public float verticalAcceleration = 2f; // m/s/s
-	public float maxVerticalSpeed = 50f; // m/s
 
-	public float maxTurnSpeed = 15f; // deg/s
-	public float turnAcceleration = 5f; // deg/s/s
-	
-
-	public float TargetAltitudeInMeters
+	public override float TargetAltitudeInMeters
 	{
 		get
 		{
@@ -50,7 +34,20 @@ public class Aircraft : MonoBehaviour
 	}
 
 
-	public float TargetHeadingInDegrees
+	public override float CurrentHeadingInDegrees
+	{
+		get
+		{
+			return transform.rotation.eulerAngles.y;
+		}
+		set
+		{
+			transform.rotation = Quaternion.Euler(new Vector3(0f, value, 0f));
+		}
+	}
+	
+
+	public override float TargetHeadingInDegrees
 	{
 		get
 		{
@@ -60,14 +57,6 @@ public class Aircraft : MonoBehaviour
 		{
 			GetComponent<HeadingController>().TargetHeadingInDegrees = value;
 		}
-//		get
-//		{
-//			return GetComponent<FutureHeadingPlanner>().GetCurrentTargetHeading();
-//		}
-//		set
-//		{
-//			GetComponent<FutureHeadingPlanner>().SetCurrentTargetHeading(value);
-//		}
 	}
 	
 
@@ -79,23 +68,11 @@ public class Aircraft : MonoBehaviour
 		moveDir.y = 0f;
 		float speedInUnitsPerSecond = UnitHelper.KMPerHourToUnitsPerSecond(speedInKMPerHour);
 		transform.position += moveDir * speedInUnitsPerSecond * Time.deltaTime;
+	}
 
 
-//		float timeStep = 0.05f;
-//		Vector3 p0 = transform.position;
-//		for (int i=0; i<1000; i++)
-//		{
-//			float altitudeAtTime = GetComponent<AltitudeController>().GetAltitudeInFuture(i * timeStep);
-//			float headingAtTime = GetComponent<HeadingController>().GetHeadingInFuture(i * timeStep);
-//
-//			Vector3 headingVector = Quaternion.Euler(new Vector3(0f, headingAtTime, 0f)) * Vector3.forward;
-//
-//			Vector3 p1 = p0 + (headingVector * speedInUnitsPerSecond * timeStep);
-//			p1.y = altitudeAtTime / ScaleManager.Instance.verticalScale;
-//
-//			Debug.DrawLine(p0, p1);
-//
-//			p0 = p1;
-//		}
+	public override float GetCurrentAltitudeChangeNormalized()
+	{
+		return GetComponent<AltitudeController>().GetCurrentSpeed() / maxVerticalSpeed;
 	}
 }

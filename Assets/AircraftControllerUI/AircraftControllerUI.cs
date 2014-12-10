@@ -7,40 +7,56 @@ using UnityTools;
 
 public class AircraftControllerUI : MonoBehaviour
 {
-	private AircraftBase aircraft;
+	public AircraftBase MyAircraft{get; set;}
 
 	public RectTransform inputHandle;
 	public RectTransform currentTargetHandle;
-
-	public Slider altitudeControlSlider;
+	public RectTransform currentHeadingHandle;
+	
 	public Text targetAltitudeText;
 	public Text currentAltitudeText;
+
+	public Image angleDifferenceDisplay;
 
 	public ChevronAnimator ascentDescentChevrons;
 
 	public float maxAltitude = 12000f;
 	public float minAltitude = 0f;
 
+	public CanvasGroup horizontalNavigationCanvasGroup;
+	public CanvasGroup altitudeDisplayCanvasGroup;
 
-	private float setAngle = 0f;
+
+	private float targetHeadingAngle = 0f;
 
 	public float becomeVisibleTime = 1f;
-	private bool shouldBeVisible = false;
 	private float currentVisibility = 0f;
+
+	public AltitudeUI altitudeUI;
+
+
+	private enum UIState
+	{
+		Hidden=0,
+		Visible,
+	}
+	private UIState currentState = UIState.Hidden;
 
 
 	void Awake()
 	{
-		aircraft = GetComponentInParent<AircraftBase>();
+		MyAircraft = GetComponentInParent<AircraftBase>();
 		SetCurrentVisibility(currentVisibility);
 	}
 	
 
 	void Start()
 	{
-		setAngle = 0f;
+		targetHeadingAngle = MyAircraft.TargetHeadingInDegrees;
+		UpdateHeadingInputHandle();
+		UpdateHeadingTargetHandle();
 
-		OnAltitudeSliderChange();
+		altitudeUI.SetTargetAltitude(MyAircraft.TargetAltitudeInMeters);
 	}
 
 
@@ -48,30 +64,61 @@ public class AircraftControllerUI : MonoBehaviour
 	{
 		transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.forward);
 
-		UpdateAltitudeSliderPosition();
-
-		// Update the current altitude text
-		currentAltitudeText.text = InputManager.GetFormattedHeightString(aircraft.CurrentAltitudeInMeters);
-
 		// Update the acent/descent chevrons
-		ascentDescentChevrons.SetAscentAmount(aircraft.GetCurrentAltitudeChangeNormalized());
+		ascentDescentChevrons.SetAscentAmount(MyAircraft.GetCurrentAltitudeChangeNormalized());
 
+		currentHeadingHandle.localRotation = Quaternion.Euler(0f, 0f, -MyAircraft.CurrentHeadingInDegrees - 90f);
+
+		UpdateUIState();
+
+		altitudeUI.SetCurrentAltitude(MyAircraft.CurrentAltitudeInMeters);
+
+		float fillAmount = (MyAircraft.TargetHeadingInDegrees - MyAircraft.CurrentHeadingInDegrees) / 360f;
+
+
+		angleDifferenceDisplay.fillAmount = Mathf.Abs(fillAmount);
+		angleDifferenceDisplay.fillClockwise = fillAmount < 0f;
+	}
+
+
+	private void UpdateUIState()
+	{
 		float targetVisibility = 0f;
-		if (shouldBeVisible)
+		if (currentState != UIState.Hidden)
 		{
 			targetVisibility = 1f;
 		}
+
 		if (currentVisibility != targetVisibility)
 		{
 			currentVisibility = Mathf.MoveTowards(currentVisibility, targetVisibility, Time.deltaTime / becomeVisibleTime);
 			SetCurrentVisibility(currentVisibility);
+		}
+
+		if (altitudeUI.CurrentState == AltitudeUI.State.input)
+		{
+			horizontalNavigationCanvasGroup.alpha = 0.2f;
+		}
+		else
+		{
+			horizontalNavigationCanvasGroup.alpha = 1f;
 		}
 	}
 
 
 	public void SetShouldBeVisible(bool shouldBeVisible)
 	{
-		this.shouldBeVisible = shouldBeVisible;
+		if (shouldBeVisible)
+		{
+			if (currentState == UIState.Hidden)
+			{
+				currentState = UIState.Visible;
+			}
+		}
+		else
+		{
+			currentState = UIState.Hidden;
+		}
 	}
 
 
@@ -84,44 +131,32 @@ public class AircraftControllerUI : MonoBehaviour
 
 #region UI Updaters
 
-	private void UpdateInputHandle()
+	private void UpdateHeadingInputHandle()
 	{
-		inputHandle.localRotation = Quaternion.Euler(0f, 0f, setAngle - 90f);
+		inputHandle.localRotation = Quaternion.Euler(0f, 0f, -targetHeadingAngle - 90f);
 	}
 	
 	
-	private void UpdateTargetHandle()
+	private void UpdateHeadingTargetHandle()
 	{
-		currentTargetHandle.localRotation = Quaternion.Euler(0f, 0f, setAngle - 90f);
+		currentTargetHandle.localRotation = Quaternion.Euler(0f, 0f, -targetHeadingAngle - 90f);
 	}
 
 
-	void UpdateAltitudeSliderPosition()
+	void SetAircraftTargetHeading()
 	{
-		RectTransform sliderTransform = altitudeControlSlider.GetComponent<RectTransform>();
-		float height = sliderTransform.rect.height;
+		float angleDifference = targetHeadingAngle - MyAircraft.CurrentHeadingInDegrees;
 
-		float altitudeRange = maxAltitude - minAltitude;
+		if (angleDifference < -180)
+		{
+			angleDifference += 360f;
+		}
+		else if (angleDifference > 180f)
+		{
+			angleDifference -= 360f;
+		}
 
-		float currentAltitude = aircraft.CurrentAltitudeInMeters;
-
-		float altitudeFraction = Mathf.Clamp01(currentAltitude/altitudeRange);
-		float sliderYPos = Mathf.Lerp(height/2f, -height/2f, altitudeFraction);
-
-		sliderTransform.anchoredPosition = new Vector2(sliderTransform.anchoredPosition.x, sliderYPos);
-	}
-
-
-	void UpdateTargetAltitudeText()
-	{
-		float altitude = Mathf.Lerp (minAltitude, maxAltitude, altitudeControlSlider.normalizedValue);
-		targetAltitudeText.text = InputManager.GetFormattedHeightString (altitude);
-	}
-
-
-	void SetAircraftTargetAltitudeFromSlider()
-	{
-		aircraft.TargetAltitudeInMeters = Mathf.Lerp (minAltitude, maxAltitude, altitudeControlSlider.normalizedValue);
+		MyAircraft.TargetHeadingInDegrees = MyAircraft.CurrentHeadingInDegrees + angleDifference;
 	}
 
 #endregion
@@ -132,33 +167,29 @@ public class AircraftControllerUI : MonoBehaviour
 	public void OnDragHeadingHandle(BaseEventData e)
 	{
 		PointerEventData pointerEvent = e as PointerEventData;
-		
-		Vector3 screenRotPoint = Camera.main.WorldToScreenPoint(inputHandle.position);
-		
-		Vector2 mouseOffsetFromPivot = new Vector2(screenRotPoint.x, screenRotPoint.y) - pointerEvent.position;
-		
-		setAngle = Mathf.Atan2(mouseOffsetFromPivot.x, -mouseOffsetFromPivot.y) * Mathf.Rad2Deg;
-		
-		UpdateInputHandle();
+
+		Vector3 uiCenterPoint = inputHandle.position;
+		Ray mouseRay = Camera.main.ScreenPointToRay(pointerEvent.position);
+		Plane plane = new Plane(Vector3.up, uiCenterPoint);
+		float dist = 0f;
+		if (plane.Raycast(mouseRay, out dist))
+		{
+			Vector3 worldMousePos = mouseRay.origin + (mouseRay.direction * dist);
+
+			Vector2 mouseOffset = new Vector2(worldMousePos.x - uiCenterPoint.x, worldMousePos.z - uiCenterPoint.z);
+			targetHeadingAngle = -Mathf.Atan2(-mouseOffset.x, mouseOffset.y) * Mathf.Rad2Deg;
+
+			UpdateHeadingInputHandle();
+		}
 	}
 
 
 	public void OnEndDragHeadingHandle(BaseEventData e)
 	{
-		UpdateTargetHandle();
+		UpdateHeadingTargetHandle();
+		SetAircraftTargetHeading();
 	}
 
-
-	public void OnAltitudeSliderChange()
-	{
-		UpdateTargetAltitudeText();
-	}
-
-
-	public void OnAltitudeSliderEndDrag(BaseEventData e)
-	{
-		SetAircraftTargetAltitudeFromSlider();
-	}
 
 #endregion
 }

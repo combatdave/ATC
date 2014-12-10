@@ -33,7 +33,7 @@ public class ChevronAnimator : MonoBehaviour
 	{
 		amount = Mathf.Clamp(amount, -1f, 1f);
 
-		transform.parent.localScale = new Vector3(1f, 1f, Mathf.Sign(amount));
+		transform.localScale = new Vector3(1f, Mathf.Sign(amount), 1f);
 
 		Color c = GetComponent<Image>().color;
 		c.a = Mathf.Abs(amount);

@@ -2,7 +2,7 @@
 using System.Collections;
 
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider)), RequireComponent(typeof(Aircraft))]
 public class NavigationUIHandler : MonoBehaviour
 {
 	public AircraftControllerUI navigationUIPrefab;
@@ -28,8 +28,9 @@ public class NavigationUIHandler : MonoBehaviour
 			return existingUI;
 		}
 
-		GameObject uiGO = Instantiate(navigationUIPrefab, transform.position, transform.rotation) as GameObject;
-		uiGO.transform.SetParent(transform);
-		return uiGO.GetComponent<AircraftControllerUI>();
+		AircraftControllerUI ui = Instantiate(navigationUIPrefab, transform.position, transform.rotation) as AircraftControllerUI;
+		ui.transform.SetParent(transform);
+		ui.MyAircraft = GetComponent<Aircraft>();
+		return ui;
 	}
 }

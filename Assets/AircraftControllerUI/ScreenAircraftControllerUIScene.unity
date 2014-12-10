@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a1530bb3f57bc141b5e3de917279c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPixelHeight: 100
+  initialPixelHeight: 35
 --- !u!1 &604646452
 GameObject:
   m_ObjectHideFlags: 0

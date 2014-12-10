@@ -41,4 +41,10 @@ public class AltitudeController : MonoBehaviour
 	{
 		return altitudePlanner.GetValueInFuture(seconds);
 	}
+
+
+	public float GetCurrentSpeed()
+	{
+		return altitudePlanner.CurrentSpeed;
+	}
 }

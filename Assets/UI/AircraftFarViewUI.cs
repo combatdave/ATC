@@ -5,16 +5,15 @@ using UnityEngine.UI;
 
 public class AircraftFarViewUI : MonoBehaviour
 {
-	public string UICameraTag = "UICamera";
-
 	void Awake()
 	{
-		GetComponent<Canvas>().worldCamera = Camera.main; //GameObject.FindGameObjectWithTag(UICameraTag).GetComponent<Camera>();
+		GetComponent<Canvas>().worldCamera = Camera.main;
 	}
 
 
 	public void OnIconClicked()
 	{
+		Debug.Log("sdfsf");
 		InputManager.Instance.SetSelectedAircraft(GetComponentInParent<Aircraft>());
 	}
 
